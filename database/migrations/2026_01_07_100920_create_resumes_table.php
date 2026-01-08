@@ -12,8 +12,30 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('resumes', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+            $table->uuid('id')->primary();
+
+            // Ownership
+            // $table->uuid('user_id');
+
+            // Core resume data
+            $table->string('title');
+            $table->text('summary');
+
+            // Flexible sections
+            $table->json('skills');
+            $table->json('languages');
+
+            // UI / template settings
+            $table->string('accent_color');
+            $table->string('template')->default('default');
+
+            $table->timestampsTz();
+
+            // Foreign key constraint
+            $table->foreignUuid('user_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade');
         });
     }
 

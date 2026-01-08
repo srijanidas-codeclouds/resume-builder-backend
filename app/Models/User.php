@@ -2,61 +2,47 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable;
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
+    use HasApiTokens, HasFactory, Notifiable, HasUuids;
 
     protected $keyType = 'string';
     public $incrementing = false;
+
     protected $fillable = [
-        'user_name',
-        'full_name',
+        'username',
+        'name',
         'email',
-        'hashed_password',
-        'disabled',
+        'password',
         'role',
+        'email_verified',
+        'email_verified_at',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
-        'hashed_password',
+        'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
+            'email_verified' => 'boolean',
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
 
-    public function getAuthPassword()
-    {
-        return $this->hashed_password;
-    }
+    /* =========================
+       Role Helpers
+    ========================= */
+
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
@@ -67,9 +53,12 @@ class User extends Authenticatable
         return $this->role === 'user';
     }
 
+    /* =========================
+       Relationships
+    ========================= */
+
     public function resumes()
     {
         return $this->hasMany(Resume::class);
     }
-
 }

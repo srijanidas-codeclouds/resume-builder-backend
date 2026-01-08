@@ -2,22 +2,21 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class PersonalDetails extends Model
+class Social extends Model
 {
-    use HasFactory, HasUuids;
+    use HasFactory,HasUuids;
 
     public $timestamps = false;
 
     protected $fillable = [
-        'full_name',
-        'designation',
-        'email',
-        'phone',
-        'location',
+        'linkedIn',
+        'github',
+        'portfolio',
+        'twitter',
         'resume_id',
     ];
 }

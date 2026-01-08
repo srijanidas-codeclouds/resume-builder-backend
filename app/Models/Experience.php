@@ -2,17 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Experience extends Model
 {
-    use HasFactory;
+    use HasFactory,HasUuids;
 
-    protected $table = 'experience';
-
-    protected $keyType = 'string';
-    public $incrementing = false;
+    public $timestamps = false;
 
     protected $fillable = [
         'resume_id',

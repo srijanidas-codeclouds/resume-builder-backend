@@ -2,26 +2,35 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Resume extends Model
-{
-    use HasFactory;
-
-    protected $keyType = 'string';
-    public $incrementing = false;
+{   
+    use HasFactory, HasUuids;
 
     protected $fillable = [
         'user_id',
         'title',
-        'professional_summary',
-        'template',
+        'summary',
+        'skills',
+        'languages',
         'accent_color',
-        'is_public',
+        'template',
     ];
 
-    // 🔗 Resume belongs to a user
+    protected $casts = [
+        'skills' => 'array',
+        'languages' => 'array',
+    ];
+
+    protected $attributes = [
+        'skills' => '[]',
+        'languages' => '[]',
+    ];
+
+    // Resume belongs to a user
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -31,11 +40,6 @@ class Resume extends Model
     public function personalInfo()
     {
         return $this->hasOne(PersonalInfo::class);
-    }
-
-    public function skills()
-    {
-        return $this->hasMany(Skill::class);
     }
 
     public function projects()
@@ -56,8 +60,8 @@ class Resume extends Model
     {
         return $this->hasMany(Certification::class);
     }
-    public function languages()
+    public function socials()
     {
-        return $this->hasMany(Language::class);
+        return $this->hasMany(Social::class);
     }
 }

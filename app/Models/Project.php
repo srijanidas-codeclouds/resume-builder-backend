@@ -15,9 +15,22 @@ class Project extends Model
     protected $fillable = [
         'resume_id',
         'name',
-        'type',
         'description',
+        'tech_stack',
+        'live_link',
+        'github_link',
+        'start_date',
+        'end_date',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'tech_stack' => 'array',
+        ];
+    }
+
+    protected $attributes = ['tech_stack' => '[]'];
 
     public function resume()
     {

@@ -2,29 +2,29 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Education extends Model
 {
-    use HasFactory;
+    use HasFactory,HasUuids;
 
-    protected $table = 'education';
-
-    protected $keyType = 'string';
-    public $incrementing = false;
+    public $timestamps = false;
 
     protected $fillable = [
         'resume_id',
         'institution',
         'degree',
         'field',
-        'graduation_date',
-        'gpa',
+        'grade',
+        'start_date',
+        'end_date',
     ];
 
     protected $casts = [
-        'graduation_date' => 'date',
+        'start_date' => 'date',
+        'end_date' => 'date',
     ];
 
     public function resume()

@@ -6,22 +6,28 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('certifications', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+            $table->uuid('id')->primary();
+            // $table->uuid('resume_id');
+
+            $table->string('title');
+            $table->string('issuer')->nullable();
+            $table->date('issued_date')->nullable();
+            $table->string('url')->nullable();
+
+            // $table->timestampsTz();
+
+            $table->foreignUuid('resume_id')
+                ->references('id')->on('resumes')
+                ->onDelete('cascade');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('certifications');
     }
 };
+

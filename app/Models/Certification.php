@@ -14,16 +14,14 @@ class Certification extends Model
 
     protected $fillable = [
         'resume_id',
-        'name',
+        'title',
         'issuer',
         'issue_date',
-        'expiry_date',
-        'credential_url',
+        'url',
     ];
 
     protected $casts = [
         'issue_date'  => 'date',
-        'expiry_date' => 'date',
     ];
 
     public function resume()

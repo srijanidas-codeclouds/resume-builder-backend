@@ -6,20 +6,30 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('projects', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+            $table->uuid('id')->primary();
+            // $table->uuid('resume_id');
+
+            $table->string('name');
+            $table->text('description');
+            $table->json('tech_stack');
+
+            $table->string('live_link')->nullable();
+            $table->string('github_link')->nullable();
+
+            $table->date('start_date');
+            $table->date('end_date')->nullable();
+
+            // $table->timestampsTz();
+
+            $table->foreignUuid('resume_id')
+                ->references('id')->on('resumes')
+                ->onDelete('cascade');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('projects');
