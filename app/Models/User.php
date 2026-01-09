@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -21,8 +22,6 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
-        'email_verified',
-        'email_verified_at',
     ];
 
     protected $hidden = [
@@ -38,6 +37,16 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    // Auto-generate UUIDs on creating
+    protected static function booted()
+    {
+    static::creating(function ($user) {
+        if (!$user->id) {
+            $user->id = (string) Str::uuid();
+        }
+    });
+}
 
     /* =========================
        Role Helpers

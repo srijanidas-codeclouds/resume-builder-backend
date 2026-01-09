@@ -8,20 +8,19 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Certification extends Model
 {
     use HasFactory;
-
+    public $timestamps = false;
     protected $keyType = 'string';
     public $incrementing = false;
 
     protected $fillable = [
-        'resume_id',
         'title',
         'issuer',
-        'issue_date',
+        'issued_date',
         'url',
     ];
 
     protected $casts = [
-        'issue_date'  => 'date',
+        'issued_date'  => 'date',
     ];
 
     public function resume()

@@ -13,7 +13,6 @@ class Education extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'resume_id',
         'institution',
         'degree',
         'field',

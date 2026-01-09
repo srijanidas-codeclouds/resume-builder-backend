@@ -17,6 +17,10 @@ class Social extends Model
         'github',
         'portfolio',
         'twitter',
-        'resume_id',
     ];
+
+    public function resume()
+    {
+        return $this->belongsTo(Resume::class);
+    }
 }

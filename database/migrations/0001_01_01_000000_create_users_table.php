@@ -16,9 +16,6 @@ return new class extends Migration
             $table->string('username');
             $table->string('name');
             $table->string('email')->unique();
-            // is email verified
-            $table->boolean('email_verified')->default(false);
-            $table->timestamp('email_verified_at')->nullable();
             // password 
             $table->string('password');
             // role

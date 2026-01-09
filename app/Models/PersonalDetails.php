@@ -10,7 +10,7 @@ class PersonalDetails extends Model
 {
     use HasFactory, HasUuids;
 
-    public $timestamps = false;
+    public $timestamps = true;
 
     protected $fillable = [
         'full_name',
@@ -19,8 +19,10 @@ class PersonalDetails extends Model
         'phone',
         'location',
     ];
-    public function resume()
-    {
-        return $this->belongsTo(Resume::class);
-    }
+
+
+public function resume()
+{
+    return $this->belongsTo(Resume::class);
+}
 }

@@ -13,8 +13,7 @@ class Experience extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'resume_id',
-        'company',
+        'organization',
         'position',
         'start_date',
         'end_date',

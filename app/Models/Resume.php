@@ -37,9 +37,9 @@ class Resume extends Model
     }
 
     // 🔗 Resume sections
-    public function personalInfo()
+    public function personalDetails()
     {
-        return $this->hasOne(PersonalInfo::class);
+        return $this->hasOne(PersonalDetails::class);
     }
 
     public function projects()
