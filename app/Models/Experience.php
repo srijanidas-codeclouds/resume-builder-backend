@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Experience extends Model
@@ -26,6 +27,16 @@ class Experience extends Model
         'start_date' => 'date',
         'end_date' => 'date',
     ];
+
+    protected static function booted()
+    {
+        static::creating(function ($resume) {
+            if (! $resume->id) {
+                $resume->id = (string) Str::uuid();
+            }
+        });
+    }
+
 
     public function resume()
     {

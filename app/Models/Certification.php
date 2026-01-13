@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -22,6 +23,16 @@ class Certification extends Model
     protected $casts = [
         'issued_date'  => 'date',
     ];
+
+    protected static function booted()
+    {
+        static::creating(function ($resume) {
+            if (! $resume->id) {
+                $resume->id = (string) Str::uuid();
+            }
+        });
+    }
+
 
     public function resume()
     {

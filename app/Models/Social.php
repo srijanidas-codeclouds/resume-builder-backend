@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 
 class Social extends Model
 {
@@ -18,6 +19,16 @@ class Social extends Model
         'portfolio',
         'twitter',
     ];
+
+    protected static function booted()
+    {
+        static::creating(function ($resume) {
+            if (! $resume->id) {
+                $resume->id = (string) Str::uuid();
+            }
+        });
+    }
+
 
     public function resume()
     {

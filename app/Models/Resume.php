@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 
 class Resume extends Model
 {   
@@ -29,6 +30,15 @@ class Resume extends Model
         'skills' => '[]',
         'languages' => '[]',
     ];
+    
+    protected static function booted()
+    {
+        static::creating(function ($resume) {
+            if (! $resume->id) {
+                $resume->id = (string) Str::uuid();
+            }
+        });
+    }
 
     // Resume belongs to a user
     public function user()
@@ -62,6 +72,6 @@ class Resume extends Model
     }
     public function socials()
     {
-        return $this->hasMany(Social::class);
+        return $this->hasOne(Social::class);
     }
 }

@@ -29,6 +29,9 @@ return new class extends Migration
             $table->string('accent_color');
             $table->string('template')->default('default');
 
+            // $table->enum('status', ['draft', 'published'])->default('draft');
+            // $table->timestamp('last_saved_at')->nullable();
+
             $table->timestampsTz();
 
             // Foreign key constraint

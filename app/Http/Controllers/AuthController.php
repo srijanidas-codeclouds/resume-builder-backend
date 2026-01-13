@@ -72,6 +72,16 @@ class AuthController extends Controller
         ]);
     }
 
+    // ✅ LOGOUT ALL DEVICES
+    public function logoutAll(Request $request)
+    {
+        $request->user()->tokens()->delete();
+
+        return response()->json([
+            'message' => 'Logged out from all devices',
+        ]);
+    }
+
     // ✅ FORGOT PASSWORD
     public function forgetPassword(Request $request)
     {
