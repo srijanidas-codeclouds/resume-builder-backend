@@ -47,6 +47,7 @@ Route::get('/resume-templates', function () {
     ]);
 });
 
+Route::get('/health', fn () => ['status' => 'ok']);
 
 //admin routes (protected/only for admin)
 
