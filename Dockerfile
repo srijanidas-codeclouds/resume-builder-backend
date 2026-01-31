@@ -1,43 +1,81 @@
-# Base PHP image
+# -------------------------
+# Base image
+# -------------------------
 FROM php:8.2-fpm
 
-# Install dependencies + MySQL PHP extension
+# -------------------------
+# System dependencies
+# -------------------------
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
-    curl \
-    libzip-dev \
+    zip \
     libpng-dev \
     libonig-dev \
     libxml2-dev \
-    libcurl4-openssl-dev \
+    libzip-dev \
     libicu-dev \
-    default-mysql-client \
-    && docker-php-ext-install pdo_mysql zip mbstring bcmath opcache intl \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+    curl \
+    && docker-php-ext-install \
+        pdo \
+        pdo_mysql \
+        mbstring \
+        exif \
+        pcntl \
+        bcmath \
+        gd \
+        zip \
+        intl \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
+# -------------------------
 # Install Composer
+# -------------------------
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
+# -------------------------
 # Set working directory
-WORKDIR /app
+# -------------------------
+WORKDIR /var/www
 
-# Copy Laravel app
+# -------------------------
+# Copy composer files first (Docker cache optimization)
+# -------------------------
+COPY composer.json composer.lock ./
+
+# -------------------------
+# Install PHP dependencies (NO dev, optimized)
+# -------------------------
+RUN composer install \
+    --no-dev \
+    --no-interaction \
+    --prefer-dist \
+    --optimize-autoloader \
+    --no-progress
+
+# -------------------------
+# Copy application source
+# -------------------------
 COPY . .
 
-# Ensure storage/cache are writable
-RUN mkdir -p storage bootstrap/cache && chmod -R 775 storage bootstrap/cache
+# -------------------------
+# Permissions (important for Laravel)
+# -------------------------
+RUN chown -R www-data:www-data /var/www \
+    && chmod -R 775 storage bootstrap/cache
 
-# Install PHP dependencies (no dev)
-RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+# -------------------------
+# Switch user
+# -------------------------
+USER www-data
 
-# Cache config, routes, views
-RUN php artisan config:cache
-RUN php artisan route:cache
-RUN php artisan view:cache
+# -------------------------
+# Expose PHP-FPM port
+# -------------------------
+EXPOSE 9000
 
-# Expose port for Render
-EXPOSE 10000
-
-# Run Laravel with migrations
-CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=$PORT
+# -------------------------
+# Start PHP-FPM
+# -------------------------
+CMD ["php-fpm"]
