@@ -1,24 +1,26 @@
 FROM php:8.4-fpm
 
-# Install system dependencies
 RUN apt-get update && apt-get install -y \
-    git curl unzip libpq-dev libonig-dev libzip-dev zip \
-    && docker-php-ext-install pdo pdo_mysql mbstring zip
+    git unzip curl \
+    libzip-dev libpng-dev libonig-dev libxml2-dev libicu-dev \
+    default-mysql-client \
+    && docker-php-ext-install pdo_mysql zip mbstring bcmath intl opcache \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www
-
-# Copy app files
 COPY . .
 
-# Install PHP dependencies
-RUN composer install --no-dev --optimize-autoloader
+RUN mkdir -p storage bootstrap/cache \
+&& chmod -R 775 storage bootstrap/cache
 
-# Laravel setup
-RUN php artisan config:clear && \
-    php artisan route:clear && \
-    php artisan view:clear
+RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
 
-CMD ["php-fpm"]
+# Important: clear cached config (Render injects env at runtime)
+RUN php artisan config:clear
+
+EXPOSE 10000
+
+CMD php artisan migrate --force && \
+    php artisan serve --host=0.0.0.0 --port=$PORT
