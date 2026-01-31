@@ -39,12 +39,10 @@ COPY . .
 # Ensure storage/cache directories are writable
 # -------------------------
 RUN mkdir -p storage bootstrap/cache && chmod -R 775 storage bootstrap/cache
-
 # -------------------------
-# Composer install (production)
+# Composer install (simplified)
 # -------------------------
-RUN php -d memory_limit=-1 /usr/bin/composer install --no-dev --optimize-autoloader --prefer-dist --verbose
-
+RUN composer install --no-dev --optimize-autoloader --prefer-dist
 # -------------------------
 # Cache config, routes, views
 # -------------------------
