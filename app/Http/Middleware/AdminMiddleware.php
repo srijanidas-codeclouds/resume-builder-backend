@@ -2,8 +2,10 @@
 
 namespace App\Http\Middleware;
 
+use App\Enums\UserRole;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class AdminMiddleware
@@ -13,9 +15,9 @@ class AdminMiddleware
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next): Response
-    {
-    $user = $request->user();
+ public function handle(Request $request, Closure $next)
+{
+   $user = $request->user();
 
         if (!$user) {
             return response()->json(['message' => 'Unauthenticated'], 401);
@@ -30,4 +32,5 @@ class AdminMiddleware
 
         return $next($request);
 }
+
 }

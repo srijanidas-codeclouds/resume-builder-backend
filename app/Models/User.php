@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Support\Str;
+use App\Notifications\ApiResetPasswordNotification;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -17,12 +18,15 @@ class User extends Authenticatable
     public $incrementing = false;
 
     protected $fillable = [
-        'username',
-        'name',
-        'email',
-        'password',
-        'role',
-    ];
+    'name',
+    'username',
+    'email',
+    'password',
+    'role',
+    'status',
+    'membership',
+];
+
 
     protected $hidden = [
         'password',
@@ -38,15 +42,27 @@ class User extends Authenticatable
         ];
     }
 
-    // Auto-generate UUIDs on creating
+    /* =========================
+       UUID Boot
+    ========================= */
+
     protected static function booted()
     {
-    static::creating(function ($user) {
-        if (!$user->id) {
-            $user->id = (string) Str::uuid();
-        }
-    });
-}
+        static::creating(function ($user) {
+            if (! $user->id) {
+                $user->id = (string) Str::uuid();
+            }
+        });
+    }
+
+    /* =========================
+       Password Reset
+    ========================= */
+
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new ApiResetPasswordNotification($token));
+    }
 
     /* =========================
        Role Helpers
@@ -70,4 +86,22 @@ class User extends Authenticatable
     {
         return $this->hasMany(Resume::class);
     }
+
+
+public function canManageUsers(): bool
+{
+    return $this->role === 'admin';
+}
+
+public function canSuspendUsers(): bool
+{
+    return $this->role === 'admin';
+}
+
+public function canDeleteUsers(): bool
+{
+    return $this->role === 'admin';
+}
+
+
 }

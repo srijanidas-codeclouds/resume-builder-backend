@@ -53,16 +53,15 @@ class ResumeController extends Controller
     {
         $user = $request->user();
 
-        $resume = $user->resumes()->create(
-            $request->only([
-                'title',
-                'summary',
-                'skills',
-                'languages',
-                'accent_color',
-                'template',
-            ])
-        );
+        $resume = $request->user()->resumes()->create([
+        'title'        => $request->title ?? 'Untitled Resume',
+        'summary'      => null,
+        'skills'       => [],
+        'languages'    => [],
+        'accent_color' => $request->accent_color ?? '#2563eb',
+        'template'     => $request->template ?? 'classic',
+        'status'       => 'draft',
+    ]);
 
         return new ResumeResource($resume);
     }
@@ -71,53 +70,95 @@ class ResumeController extends Controller
         UPDATE RESUME
     ====================== */
     public function update(ResumeFormRequest $request, string $id)
-    {
-        $resume = $request->user()
-            ->resumes()
-            ->findOrFail($id);
+{
+    $resume = $request->user()
+        ->resumes()
+        ->findOrFail($id);
 
-        $data = $request->validated();
-
-        DB::transaction(function () use ($resume, $data) {
-
-            /* ---------- CORE ---------- */
-            $resume->update([
-                'title'        => $data['title'],
-                'summary'      => $data['summary'],
-                'skills'       => $data['skills'],
-                'languages'    => $data['languages'],
-                'accent_color' => $data['accent_color'],
-                'template'     => $data['template'],
-            ]);
-
-            /* ---------- PERSONAL (hasOne) ---------- */
-            if (!empty($data['personal_details'])) {
-                $resume->personalDetails()->updateOrCreate(
-                    [],
-                    $data['personal_details']
-                );
-            }
-
-            /* ---------- HAS MANY HELPERS ---------- */
-            $this->syncHasMany($resume, 'projects', $data['projects'] ?? []);
-            $this->syncHasMany($resume, 'experiences', $data['experiences'] ?? []);
-            $this->syncHasMany($resume, 'education', $data['education'] ?? []);
-            $this->syncHasMany($resume, 'certifications', $data['certifications'] ?? []);
-
-            /* ---------- SOCIALS (hasOne) ---------- */
-            if (!empty($data['socials'])) {
-                $resume->socials()->updateOrCreate(
-                    [],
-                    $data['socials']
-                );
-            }
-        });
-
+    /* =====================
+       CONFLICT DETECTION
+    ===================== */
+    if (
+        $request->filled('version') &&
+        (int) $request->version !== (int) $resume->version
+    ) {
         return response()->json([
-            'success' => true,
-            'message' => 'Resume updated successfully'
-        ]);
+            'success' => false,
+            'message' => 'Conflict detected. Resume was updated elsewhere.',
+            'server_version' => $resume->version,
+            'server_data' => new ResumeResource($resume->load([
+                'personalDetails',
+                'socials',
+                'projects',
+                'experiences',
+                'education',
+                'certifications',
+            ])),
+        ], 409);
     }
+
+    $data = $request->validated();
+
+    DB::transaction(function () use ($resume, $data) {
+
+        /* =====================
+           CORE (partial-safe)
+        ===================== */
+        $resume->update(array_filter([
+            'title'        => $data['title']        ?? null,
+            'summary'      => $data['summary']      ?? null,
+            'skills'       => $data['skills']       ?? null,
+            'languages'    => $data['languages']    ?? null,
+            'accent_color' => $data['accent_color'] ?? null,
+            'template'     => $data['template']     ?? null,
+            'version'      => $resume->version + 1,
+        ], fn ($v) => !is_null($v)));
+
+        /* =====================
+           HAS ONE
+        ===================== */
+        if (array_key_exists('personal_details', $data)) {
+            $resume->personalDetails()->updateOrCreate(
+                ['resume_id' => $resume->id],
+                $data['personal_details'] ?? []
+            );
+        }
+
+        if (array_key_exists('socials', $data)) {
+            $resume->socials()->updateOrCreate(
+                ['resume_id' => $resume->id],
+                $data['socials'] ?? []
+            );
+        }
+
+        /* =====================
+           HAS MANY
+        ===================== */
+        if (array_key_exists('projects', $data)) {
+            $this->syncHasMany($resume, 'projects', $data['projects'] ?? []);
+        }
+
+        if (array_key_exists('experiences', $data)) {
+            $this->syncHasMany($resume, 'experiences', $data['experiences'] ?? []);
+        }
+
+        if (array_key_exists('education', $data)) {
+            $this->syncHasMany($resume, 'education', $data['education'] ?? []);
+        }
+
+        if (array_key_exists('certifications', $data)) {
+            $this->syncHasMany($resume, 'certifications', $data['certifications'] ?? []);
+        }
+    });
+
+    return response()->json([
+        'success' => true,
+        'version' => $resume->fresh()->version,
+        'status'  => $resume->status,
+        'message' => 'Resume autosaved',
+    ]);
+}
+
 
     /* ======================
         DELETE RESUME

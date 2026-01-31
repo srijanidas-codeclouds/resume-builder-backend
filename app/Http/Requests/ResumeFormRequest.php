@@ -12,85 +12,93 @@ class ResumeFormRequest extends FormRequest
     }
 
     public function rules(): array
-    {
-        return [
+{
+    $isCreating = $this->isMethod('post');
+    $templates = implode(',', array_keys(config('resume_templates')));
 
-            /* =====================
-               CORE RESUME
-            ===================== */
-            'title' => 'required|string|min:5|max:255',
-            'summary' => 'required|string|min:50|max:1500',
-            'skills' => 'required|array|min:1',
-            'skills.*' => 'string|min:2|max:50',
-            'languages' => 'required|array|min:1',
-            'languages.*.name' => 'required|string|min:2',
-            'languages.*.level' => 'required|string|in:basic,intermediate,fluent,native',
-            'accent_color' => 'required|string',
-            'template' => 'required|string',
+    return [
 
-            /* =====================
-               PERSONAL DETAILS
-            ===================== */
-            'personal_details' => 'required|array',
-            'personal_details.full_name' => 'required|string|max:255',
-            'personal_details.designation' => 'required|string|max:255',
-            'personal_details.email' => 'required|email',
-            'personal_details.phone' => 'nullable|string|max:20',
-            'personal_details.location' => 'nullable|string|max:255',
+        /* =====================
+           CORE RESUME
+        ===================== */
+        'title' => 'sometimes|nullable|string|min:5|max:255',
+        'summary' => 'sometimes|nullable|string|max:1500',
 
-            /* =====================
-               PROJECTS
-            ===================== */
-            'projects' => 'nullable|array',
-            'projects.*.name' => 'required|string|max:255',
-            'projects.*.description' => 'required|string',
-            'projects.*.tech_stack' => 'required|array|min:1',
-            'projects.*.tech_stack.*' => 'string|max:50',
-            'projects.*.start_date' => 'required|date',
-            'projects.*.end_date' => 'nullable|date|after_or_equal:projects.*.start_date',
-            'projects.*.live_link' => 'nullable|url',
-            'projects.*.github_link' => 'nullable|url',
+        'skills' => 'sometimes|nullable|array',
+        'skills.*' => 'sometimes|nullable|string|min:2|max:50',
 
-            /* =====================
-               EXPERIENCES
-            ===================== */
-            'experiences' => 'nullable|array',
-            'experiences.*.organization' => 'required|string|max:255',
-            'experiences.*.position' => 'required|string|max:255',
-            'experiences.*.description' => 'required|string',
-            'experiences.*.start_date' => 'required|date',
-            'experiences.*.end_date' => 'nullable|date|after_or_equal:experiences.*.start_date',
-            'experiences.*.is_current' => 'boolean',
+        'languages' => 'sometimes|nullable|array',
+        'languages.*.name' => 'sometimes|nullable|string|min:2',
+        'languages.*.level' => 'sometimes|nullable|string|in:basic,intermediate,fluent,native',
 
-            /* =====================
-               EDUCATION
-            ===================== */
-            'education' => 'nullable|array',
-            'education.*.institution' => 'required|string|max:255',
-            'education.*.degree' => 'required|string|max:255',
-            'education.*.field' => 'nullable|string|max:255',
-            'education.*.grade' => 'nullable|string|max:20',
-            'education.*.start_date' => 'required|date',
-            'education.*.end_date' => 'nullable|date|after_or_equal:education.*.start_date',
+        'accent_color' => 'sometimes|nullable|string|regex:/^#([A-Fa-f0-9]{6})$/',
+        'template' => 'sometimes|nullable|in:classic,modern',
+        'status' => 'sometimes|nullable|in:draft,published',
 
-            /* =====================
-               CERTIFICATIONS
-            ===================== */
-            'certifications' => 'nullable|array',
-            'certifications.*.title' => 'required|string|max:255',
-            'certifications.*.issuer' => 'nullable|string|max:255',
-            'certifications.*.issued_date' => 'nullable|date',
-            'certifications.*.url' => 'nullable|url',
+        /* =====================
+           PERSONAL DETAILS
+        ===================== */
+        'personal_details' => 'sometimes|nullable|array',
+        'personal_details.full_name' => 'sometimes|nullable|string|max:255',
+        'personal_details.designation' => 'sometimes|nullable|string|max:255',
+        'personal_details.email' => 'sometimes|nullable|email',
+        'personal_details.phone' => 'sometimes|nullable|string|max:20',
+        'personal_details.location' => 'sometimes|nullable|string|max:255',
 
-            /* =====================
-               SOCIALS
-            ===================== */
-            'socials' => 'nullable|array',
-            'socials.linkedin' => 'nullable|url',
-            'socials.github' => 'nullable|url',
-            'socials.portfolio' => 'nullable|url',
-            'socials.twitter' => 'nullable|url',
-        ];
-    }
+        /* =====================
+           PROJECTS
+        ===================== */
+        'projects' => 'sometimes|nullable|array',
+        'projects.*.name' => 'sometimes|nullable|string|max:255',
+        'projects.*.description' => 'sometimes|nullable|string',
+        'projects.*.tech_stack' => 'sometimes|nullable|array',
+        'projects.*.tech_stack.*' => 'sometimes|nullable|string|max:50',
+        'projects.*.start_date' => 'sometimes|nullable|date',
+        'projects.*.end_date' => 'sometimes|nullable|date',
+        'projects.*.live_link' => 'sometimes|nullable|url',
+        'projects.*.github_link' => 'sometimes|nullable|url',
+
+        /* =====================
+           EXPERIENCES
+        ===================== */
+        'experiences' => 'sometimes|nullable|array',
+        'experiences.*.organization' => 'sometimes|nullable|string|max:255',
+        'experiences.*.position' => 'sometimes|nullable|string|max:255',
+        'experiences.*.description' => 'sometimes|nullable|string',
+        'experiences.*.start_date' => 'sometimes|nullable|date',
+        'experiences.*.end_date' => 'sometimes|nullable|date',
+        'experiences.*.is_current' => 'sometimes|nullable|boolean',
+
+        /* =====================
+           EDUCATION
+        ===================== */
+        'education' => 'sometimes|nullable|array',
+        'education.*.institution' => 'sometimes|nullable|string|max:255',
+        'education.*.degree' => 'sometimes|nullable|string|max:255',
+        'education.*.field' => 'sometimes|nullable|string|max:255',
+        'education.*.grade' => 'sometimes|nullable|string|max:20',
+        'education.*.start_date' => 'sometimes|nullable|date',
+        'education.*.end_date' => 'sometimes|nullable|date',
+
+        /* =====================
+           CERTIFICATIONS
+        ===================== */
+        'certifications' => 'sometimes|nullable|array',
+        'certifications.*.title' => 'sometimes|nullable|string|max:255',
+        'certifications.*.issuer' => 'sometimes|nullable|string|max:255',
+        'certifications.*.issued_date' => 'sometimes|nullable|date',
+        'certifications.*.url' => 'sometimes|nullable|url',
+
+        /* =====================
+           SOCIALS
+        ===================== */
+        'socials' => 'sometimes|nullable|array',
+        'socials.linkedIn' => 'sometimes|nullable|url',
+        'socials.github' => 'sometimes|nullable|url',
+        'socials.portfolio' => 'sometimes|nullable|url',
+        'socials.twitter' => 'sometimes|nullable|url',
+    ];
+}
+
 }
 
