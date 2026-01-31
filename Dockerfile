@@ -41,9 +41,8 @@ COPY . .
 RUN mkdir -p storage bootstrap/cache && chmod -R 775 storage bootstrap/cache
 
 # -------------------------
-# Composer install (debug mode)
+# Composer install (production)
 # -------------------------
-RUN composer diagnose
 RUN php -d memory_limit=-1 /usr/bin/composer install --no-dev --optimize-autoloader --prefer-dist --verbose
 
 # -------------------------
