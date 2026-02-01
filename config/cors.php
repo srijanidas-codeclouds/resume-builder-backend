@@ -1,35 +1,22 @@
 <?php
 
 return [
-
-    /*
-    |--------------------------------------------------------------------------
-    | Cross-Origin Resource Sharing (CORS) Configuration
-    |--------------------------------------------------------------------------
-    |
-    | Here you may configure your settings for cross-origin resource sharing
-    | or "CORS". This determines what cross-origin operations may execute
-    | in web browsers. You are free to adjust these settings as needed.
-    |
-    | To learn more: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
-    |
-    */
-
-    'paths' => ['api/*', 'auth/*','email/*', 'sanctum/csrf-cookie'],
+    'paths' => ['api/*', 'sanctum/csrf-cookie'],
 
     'allowed_methods' => ['*'],
 
     'allowed_origins' => [
-        'http://localhost:5173',
-        'https://resume-builder-frontend-ten-rosy.vercel.app',
         'https://resume-builder-frontend-7ymb405dk.vercel.app',
     ],
 
-    'allowed_origins_patterns' => [],
+    'allowed_headers' => [
+        'Content-Type',
+        'Authorization',
+        'X-Requested-With',
+        'Accept',
+    ],
 
-    'allowed_headers' => ['*'],
-
-    'exposed_headers' => ['Authorization'],
+    'exposed_headers' => [],
 
     'max_age' => 0,
 
