@@ -11,7 +11,7 @@ return [
         'https://resume-builder-frontend-mwbr9ugn4.vercel.app',
     ],
 
-    'allowed_headers' => ['*'],
+    'allowed_headers' => ['Content-Type', 'X-Requested-With', 'Authorization', 'Accept'],
 
     'exposed_headers' => ['Authorization'],
 
