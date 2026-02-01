@@ -15,23 +15,23 @@ return [
     |
     */
 
-    'paths' => ['api/*', 'auth/bridge', 'sanctum/csrf-cookie'],
+    'paths' => ['api/*', 'auth/*','email/*', 'sanctum/csrf-cookie'],
 
     'allowed_methods' => ['*'],
 
     'allowed_origins' => [
-    config('app.frontend_url', 'http://localhost:5173'),
+        'http://localhost:5173',
+        'https://resume-builder-frontend-ten-rosy.vercel.app',
+        'https://resume-builder-frontend-7ymb405dk.vercel.app',
     ],
 
     'allowed_origins_patterns' => [],
 
     'allowed_headers' => ['*'],
 
-    'exposed_headers' => [],
+    'exposed_headers' => ['Authorization'],
 
     'max_age' => 0,
 
-    'supports_credentials' => true,
-
-
+    'supports_credentials' => false,
 ];
