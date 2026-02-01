@@ -1,23 +1,17 @@
 <?php
 
 return [
-    'paths' => ['api/*', 'sanctum/csrf-cookie'],
+    'paths' => ['api/*', 'auth/*', 'email/*'],
 
     'allowed_methods' => ['*'],
 
-    // Leave this empty when using patterns
-    'allowed_origins' => [],
-
-    'allowed_origins_patterns' => [
-        '^https:\/\/.*\.vercel\.app$',
+    'allowed_origins' => [
+        'http://localhost:5173',
+        'http://localhost:3000',
+        'https://resume-builder-frontend-mwbr9ugn4.vercel.app',
     ],
 
-    'allowed_headers' => [
-        'Content-Type',
-        'Authorization',
-        'X-Requested-With',
-        'Accept',
-    ],
+    'allowed_headers' => ['*'],
 
     'exposed_headers' => ['Authorization'],
 
@@ -25,4 +19,3 @@ return [
 
     'supports_credentials' => false,
 ];
-
