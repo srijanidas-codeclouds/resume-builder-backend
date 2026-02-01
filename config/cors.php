@@ -5,8 +5,11 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => [
-        'https://resume-builder-frontend-7ymb405dk.vercel.app',
+    // Leave this empty when using patterns
+    'allowed_origins' => [],
+
+    'allowed_origins_patterns' => [
+        '^https:\/\/.*\.vercel\.app$',
     ],
 
     'allowed_headers' => [
@@ -16,9 +19,10 @@ return [
         'Accept',
     ],
 
-    'exposed_headers' => [],
+    'exposed_headers' => ['Authorization'],
 
     'max_age' => 0,
 
     'supports_credentials' => false,
 ];
+

@@ -20,6 +20,9 @@ RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoload
 # Important: clear cached config (Render injects env at runtime)
 RUN php artisan config:clear
 
+# Important: clear cached routes (Render injects env at runtime)
+RUN php artisan route:clear
+
 EXPOSE 10000
 
 CMD php artisan migrate --force && \
