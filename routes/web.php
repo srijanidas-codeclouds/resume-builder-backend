@@ -1,7 +1,8 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminAuthController;
+use App\Http\Controllers\Admin\DashboardController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -10,3 +11,19 @@ Route::get('/', function () {
 // Route::post('/register', [AuthController::class, 'register']);
 // Route::post('/login',[AuthController::class,'login']);
 // Route::post('/logout',[AuthController::class,'logout'])->middleware('auth:sanctum');
+
+Route::prefix('blade-admin')->middleware('no.back')->group(function () {
+
+    Route::get('/login', [AdminAuthController::class, 'showLogin'])
+        ->name('blade.admin.login');
+
+    Route::post('/login', [AdminAuthController::class, 'login'])
+    ->name('blade.admin.login.submit');
+
+    Route::middleware(['auth', 'admin.redirect'])->group(function () {
+        Route::get('/dashboard', [DashboardController::class, 'index'])
+            ->name('blade.admin.dashboard');
+
+        Route::post('/logout', [AdminAuthController::class, 'logout']);
+    });
+});

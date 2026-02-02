@@ -18,6 +18,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin'=>App\Http\Middleware\AdminMiddleware::class,
             'user.only'=>App\Http\Middleware\CheckUserRole::class,
+            'admin.redirect'=>App\Http\Middleware\AdminRedirect::class,
+            'no.back'=>App\Http\Middleware\NoBackButton::class
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
