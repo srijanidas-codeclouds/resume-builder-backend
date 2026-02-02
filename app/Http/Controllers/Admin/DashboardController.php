@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\User;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Collection;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Schema;
 
 class DashboardController extends Controller
 {
@@ -19,10 +20,14 @@ class DashboardController extends Controller
             'users' => $users,
             'logs' => $logs,
             'stats' => [
-                'total_users' => User::count(),
-                'admins' => User::where('role', 'admin')->count(),
-                'active_users' => User::where('status', 'active')->count(),
-            ],
+    'total_users' => User::count(),
+    'admins' => Schema::hasColumn('users', 'role')
+        ? User::where('role', 'admin')->count()
+        : 0,
+    'active_users' => Schema::hasColumn('users', 'status')
+        ? User::where('status', 'active')->count()
+        : 0,
+],
         ]);
     }
 
@@ -34,17 +39,20 @@ class DashboardController extends Controller
         $logs = collect();
 
         // Recently logged in users
-        User::whereNotNull('last_login_at')
-            ->latest('last_login_at')
-            ->limit(5)
-            ->get()
-            ->each(function ($user) use ($logs) {
-                $logs->push([
-                    'time' => $user->last_login_at,
-                    'type' => 'info',
-                    'message' => "User '{$user->username}' logged in",
-                ]);
-            });
+        if (Schema::hasColumn('users', 'last_login_at')) {
+    User::whereNotNull('last_login_at')
+        ->latest('last_login_at')
+        ->limit(5)
+        ->get()
+        ->each(function ($user) use ($logs) {
+            $logs->push([
+                'time' => $user->last_login_at,
+                'type' => 'info',
+                'message' => "User '" . ($user->username ?? 'Unknown') . "' logged in",
+            ]);
+        });
+}
+
 
         // Recently created users
         User::latest()
