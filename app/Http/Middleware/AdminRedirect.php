@@ -19,8 +19,10 @@ class AdminRedirect
         return redirect()->route('blade.admin.login');
     }
 
-    if (auth()->user()->role !== 'admin') {
-        abort(403);
+    $user = auth()->user();
+
+    if ($user->role !== 'admin') {
+        abort(403, 'Admins only');
     }
 
     return $next($request);

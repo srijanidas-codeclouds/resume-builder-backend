@@ -20,7 +20,7 @@ Route::prefix('blade-admin')->middleware('no.back')->group(function () {
     Route::post('/login', [AdminAuthController::class, 'login'])
     ->name('blade.admin.login.submit');
 
-    Route::middleware(['auth', 'admin.redirect'])->group(function () {
+    Route::middleware(['admin.redirect'])->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])
             ->name('blade.admin.dashboard');
 
