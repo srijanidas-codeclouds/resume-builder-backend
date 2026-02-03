@@ -16,7 +16,7 @@ class AdminRedirect
     public function handle($request, Closure $next)
 {
     if (!auth()->check()) {
-        return redirect()->route('blade.admin.login');
+        return redirect()->route('login');
     }
 
     $user = auth()->user();

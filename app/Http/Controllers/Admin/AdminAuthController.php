@@ -4,96 +4,174 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Contracts\View\View;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 
 class AdminAuthController extends Controller
 {
     /**
-     * Show admin login page
-     * Forces fresh authentication every time (double protection)
+     * Display the admin login page.
+     * Ensures any existing session is cleared for security.
      */
-    public function showLogin()
+    public function showLogin(): View
     {
-        // Ensure no existing session is reused
-        Auth::logout();
-        request()->session()->invalidate();
-        request()->session()->regenerateToken();
+        // Only logout if user is already authenticated
+        if (Auth::check()) {
+            $this->clearSession();
+        }
 
         return view('admin.auth.login');
     }
 
     /**
-     * Handle admin login
+     * Handle admin login authentication.
      */
-    public function login(Request $request)
+    public function login(Request $request): RedirectResponse
     {
-        $request->validate([
-            'login' => 'required|string',
-            'password' => 'required|string',
-        ]);
+        $credentials = $this->validateLoginRequest($request);
 
-        // Allow login using email or username
-        $user = User::where('email', $request->login)
-            ->orWhere('username', $request->login)
-            ->first();
+        $user = $this->findAdminUser($credentials['login']);
 
-        // User not found
         if (!$user) {
-            session()->flash('failed_login', [
-                'username' => $request->login,
-                'ip' => $request->ip(),
-                'time' => now(),
-            ]);
-
-            return back()->withErrors([
-                'login' => 'User not found',
-            ]);
+            $this->logFailedAttempt($request, $credentials['login']);
+            return $this->failedLogin('These credentials do not match our records.');
         }
 
-        // Restrict access to admin users only
-        if ($user->role !== 'admin') {
-            return back()->withErrors([
-                'login' => 'Unauthorized access',
-            ]);
+        if (!$this->verifyPassword($credentials['password'], $user->password)) {
+            $this->logFailedAttempt($request, $user->username ?? $user->email);
+            return $this->failedLogin('The provided password is incorrect.', 'password');
         }
 
-        // Password verification
-        if (!Hash::check($request->password, $user->password)) {
-            session()->flash('failed_login', [
-                'username' => $user->username,
-                'ip' => $request->ip(),
-                'time' => now(),
-            ]);
-
-            return back()->withErrors([
-                'password' => 'Incorrect password',
-            ]);
-        }
-
-        // Authenticate user and regenerate session
-        Auth::login($user, false);
-        $request->session()->regenerate();
-
-        // Update last login timestamp
-        $user->update([
-            'last_login_at' => now(),
-        ]);
-
-        return redirect()->route('blade.admin.dashboard');
+        return $this->authenticateUser($request, $user);
     }
 
     /**
-     * Logout admin and redirect back to React admin panel
+     * Logout the admin user.
      */
-    public function logout(Request $request)
+    public function logout(Request $request): RedirectResponse
+    {
+        $this->clearSession();
+
+        // Use config for redirect URL instead of hardcoded value
+        $redirectUrl = config('app.admin_frontend_url', 'http://localhost:5173/admin');
+
+        return redirect()->away($redirectUrl);
+    }
+
+    /**
+     * Validate the login request.
+     */
+    private function validateLoginRequest(Request $request): array
+    {
+        return $request->validate([
+            'login' => ['required', 'string', 'max:255'],
+            'password' => ['required', 'string', 'min:6'],
+        ], [
+            'login.required' => 'Please enter your email or username.',
+            'password.required' => 'Please enter your password.',
+            'password.min' => 'Password must be at least 6 characters.',
+        ]);
+    }
+
+    /**
+     * Find an admin user by email or username.
+     */
+    private function findAdminUser(string $login): ?User
+    {
+        return User::query()
+            ->where(function ($query) use ($login) {
+                $query->where('email', $login)
+                      ->orWhere('username', $login);
+            })
+            ->where('role', 'admin')
+            ->first();
+    }
+
+    /**
+     * Verify the provided password against the hashed password.
+     */
+    private function verifyPassword(string $password, string $hashedPassword): bool
+    {
+        return Hash::check($password, $hashedPassword);
+    }
+
+    /**
+     * Authenticate the user and regenerate session.
+     */
+    private function authenticateUser(Request $request, User $user): RedirectResponse
+    {
+        // Login with "remember me" enabled
+        Auth::login($user, true);
+        
+        // Regenerate session to prevent session fixation attacks
+        $request->session()->regenerate();
+
+        // Update last login timestamp
+        $this->updateLastLogin($user);
+
+        // Flash success message
+        session()->flash('login_success', [
+            'message' => 'Welcome back, ' . ($user->username ?? $user->name ?? 'Admin'),
+            'time' => now(),
+        ]);
+
+        return redirect()
+            ->intended(route('blade.admin.dashboard'))
+            ->with('status', 'Successfully logged in!');
+    }
+
+    /**
+     * Update the user's last login timestamp.
+     */
+    private function updateLastLogin(User $user): void
+    {
+        // Only update if column exists
+        if (in_array('last_login_at', $user->getFillable())) {
+            $user->update(['last_login_at' => now()]);
+        }
+    }
+
+    /**
+     * Log failed login attempt for security monitoring.
+     */
+    private function logFailedAttempt(Request $request, string $identifier): void
+    {
+        session()->flash('failed_login', [
+            'identifier' => $identifier,
+            'ip' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'timestamp' => now(),
+        ]);
+
+        // Optional: Log to file or database for security audit
+        // Log::warning('Failed admin login attempt', [
+        //     'identifier' => $identifier,
+        //     'ip' => $request->ip(),
+        // ]);
+    }
+
+    /**
+     * Return a failed login response.
+     */
+    private function failedLogin(string $message, string $field = 'login'): RedirectResponse
+    {
+        return back()
+            ->withInput(request()->only('login'))
+            ->withErrors([$field => $message]);
+    }
+
+    /**
+     * Clear the current session and logout.
+     */
+    private function clearSession(): void
     {
         Auth::logout();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return redirect()->away('https://resume-builder-frontend-ruby-nine.vercel.app/admin');
+        
+        request()->session()->invalidate();
+        request()->session()->regenerateToken();
     }
 }

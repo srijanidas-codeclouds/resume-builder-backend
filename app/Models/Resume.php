@@ -146,4 +146,9 @@ protected $appends = ['completion'];
     {
         return $this->hasOne(Social::class);
     }
+    public function atsScores()
+{
+    return $this->hasMany(AtsScore::class);
+}
+
 }

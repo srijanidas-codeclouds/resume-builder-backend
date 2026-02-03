@@ -15,7 +15,7 @@ Route::get('/', function () {
 Route::prefix('blade-admin')->middleware('no.back')->group(function () {
 
     Route::get('/login', [AdminAuthController::class, 'showLogin'])
-        ->name('blade.admin.login');
+        ->name('login');
 
     Route::post('/login', [AdminAuthController::class, 'login'])
     ->name('blade.admin.login.submit');
@@ -24,6 +24,7 @@ Route::prefix('blade-admin')->middleware('no.back')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])
             ->name('blade.admin.dashboard');
 
-        Route::post('/logout', [AdminAuthController::class, 'logout']);
+        Route::post('/logout', [AdminAuthController::class, 'logout'])
+            ->name('blade.admin.logout');
     });
 });

@@ -61,5 +61,19 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
 
     Route::post('/users/bulk', [AdminUserController::class, 'bulkAction']);
 
-    Route::get('/stats', [AdminStatsController::class, 'index']);
+    Route::prefix('stats')->group(function () {
+        Route::get('/summary', [AdminStatsController::class, 'index'])
+            ->name('api.admin.stats.summary');
+        Route::get('/', [AdminStatsController::class, 'getStats'])
+            ->name('api.admin.stats');
+
+        Route::get('/user-growth', [AdminStatsController::class, 'getUserGrowth'])
+            ->name('api.admin.stats.user-growth');
+
+        Route::get('/system-health', [AdminStatsController::class, 'getSystemHealth'])
+            ->name('api.admin.stats.system-health');
+
+        Route::get('/activity-logs', [AdminStatsController::class, 'getActivityLogs'])
+            ->name('api.admin.stats.activity-logs');
+    });
 });

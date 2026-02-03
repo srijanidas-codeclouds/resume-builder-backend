@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Http\Resources\UserResource;
+use Illuminate\Support\Facades\Hash;
 
 class AdminUserController extends Controller
 {
@@ -64,14 +65,13 @@ class AdminUserController extends Controller
         ]);
 
         if (!empty($data['password'])) {
-            $data['password'] = \Hash::make($data['password']);
+            $data['password'] = Hash::make($data['password']);
         }
 
         $user = User::create($data);
 
         return new UserResource($user);
     }
-
 
     public function update(Request $request, $id)
     {
@@ -112,7 +112,6 @@ class AdminUserController extends Controller
         return response()->noContent();
     }
 
-
     public function bulkAction(Request $request)
     {
         $user = $request->user();
@@ -144,7 +143,7 @@ class AdminUserController extends Controller
     }
 
     public function show($id)
-{
+    {
     // Find the user and count their related 'resumes'
     $user = User::withCount('resumes')->find($id);
 
@@ -153,5 +152,5 @@ class AdminUserController extends Controller
     }
 
     return response()->json($user);
-}
+    }
 }
