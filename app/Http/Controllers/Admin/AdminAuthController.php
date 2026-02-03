@@ -57,7 +57,7 @@ class AdminAuthController extends Controller
         $this->clearSession();
 
         // Use config for redirect URL instead of hardcoded value
-        $redirectUrl = config('app.admin_frontend_url', 'http://localhost:5173/admin');
+        $redirectUrl = config('app.admin_frontend_url', 'https://resume-builder-frontend-ruby-nine.vercel.app/admin');
 
         return redirect()->away($redirectUrl);
     }
