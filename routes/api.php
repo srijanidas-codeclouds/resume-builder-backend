@@ -61,9 +61,12 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
 
     Route::post('/users/bulk', [AdminUserController::class, 'bulkAction']);
 
+    // Statistics & Analytics Routes
     Route::prefix('stats')->group(function () {
+        // Existing routes
         Route::get('/summary', [AdminStatsController::class, 'index'])
             ->name('api.admin.stats.summary');
+        
         Route::get('/', [AdminStatsController::class, 'getStats'])
             ->name('api.admin.stats');
 
@@ -75,5 +78,25 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
 
         Route::get('/activity-logs', [AdminStatsController::class, 'getActivityLogs'])
             ->name('api.admin.stats.activity-logs');
+
+        // NEW: Additional SaaS metrics routes
+        Route::get('/revenue-data', [AdminStatsController::class, 'getRevenueData'])
+            ->name('api.admin.stats.revenue-data');
+
+        Route::get('/membership-distribution', [AdminStatsController::class, 'getMembershipDistribution'])
+            ->name('api.admin.stats.membership-distribution');
+
+        Route::get('/resume-trends', [AdminStatsController::class, 'getResumeCreationTrends'])
+            ->name('api.admin.stats.resume-trends');
+
+        Route::get('/engagement-metrics', [AdminStatsController::class, 'getEngagementMetrics'])
+            ->name('api.admin.stats.engagement-metrics');
+
+        Route::get('/top-users', [AdminStatsController::class, 'getTopUsers'])
+            ->name('api.admin.stats.top-users');
+
+        // Cache management
+        Route::post('/clear-cache', [AdminStatsController::class, 'clearCache'])
+            ->name('api.admin.stats.clear-cache');
     });
 });

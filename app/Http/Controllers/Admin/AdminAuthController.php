@@ -53,14 +53,20 @@ class AdminAuthController extends Controller
      * Logout the admin user.
      */
     public function logout(Request $request): RedirectResponse
-    {
-        $this->clearSession();
+{
+    Auth::guard('web')->logout();
 
-        // Use config for redirect URL instead of hardcoded value
-        $redirectUrl = config('app.admin_frontend_url', 'https://resume-builder-frontend-ruby-nine.vercel.app/admin');
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
 
-        return redirect()->away($redirectUrl);
-    }
+    $redirectUrl = config(
+        'app.admin_frontend_url',
+        'https://resume-builder-frontend-ruby-nine.vercel.app/admin'
+    );
+
+    return redirect()->away($redirectUrl);
+}
+
 
     /**
      * Validate the login request.
