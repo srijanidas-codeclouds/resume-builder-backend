@@ -75,6 +75,7 @@ class DashboardController extends Controller
     /**
      * Build activity logs from user data.
      */
+    // Make sure your logs are properly cast
     private function getActivityLogs(int $limit = 10): Collection
     {
         $logs = collect();
@@ -86,6 +87,13 @@ class DashboardController extends Controller
         return $logs
             ->sortByDesc('time')
             ->take($limit)
+            ->map(function ($log) {
+                // Ensure time is always a Carbon instance
+                if (is_string($log['time'])) {
+                    $log['time'] = \Carbon\Carbon::parse($log['time']);
+                }
+                return $log;
+            })
             ->values();
     }
 

@@ -563,30 +563,33 @@
         </div>
 
         {{-- System Activity Logs --}}
-        <h3 class="section-title">System Activity Logs</h3>
-        <div class="log-container" role="log" aria-label="System activity logs">
-            @forelse($logs as $log)
-                <div class="log-entry">
-                    <span class="log-time">[{{ $log['time']->format('H:i:s') }}]</span>
+        {{-- System Activity Logs --}}
+<h3 class="section-title">System Activity Logs</h3>
+<div class="log-container" role="log" aria-label="System activity logs">
+    @forelse($logs as $log)
+        <div class="log-entry">
+            <span class="log-time">
+                [{{ is_string($log['time']) ? \Carbon\Carbon::parse($log['time'])->format('H:i:s') : $log['time']->format('H:i:s') }}]
+            </span>
 
-                    @if($log['type'] === 'success')
-                        <span class="log-success">SUCCESS:</span>
-                    @elseif($log['type'] === 'error')
-                        <span class="log-error">ERROR:</span>
-                    @elseif($log['type'] === 'info')
-                        <span class="log-info">INFO:</span>
-                    @else
-                        <span class="log-system">SYSTEM:</span>
-                    @endif
+            @if($log['type'] === 'success')
+                <span class="log-success">SUCCESS:</span>
+            @elseif($log['type'] === 'error')
+                <span class="log-error">ERROR:</span>
+            @elseif($log['type'] === 'info')
+                <span class="log-info">INFO:</span>
+            @else
+                <span class="log-system">SYSTEM:</span>
+            @endif
 
-                    {{ $log['message'] }}
-                </div>
-            @empty
-                <div class="log-entry">
-                    <span class="log-system">SYSTEM:</span> No recent activity detected.
-                </div>
-            @endforelse
+            {{ $log['message'] }}
         </div>
+    @empty
+        <div class="log-entry">
+            <span class="log-system">SYSTEM:</span> No recent activity detected.
+        </div>
+    @endforelse
+</div>
 
         {{-- Footer --}}
         <footer class="admin-footer">
