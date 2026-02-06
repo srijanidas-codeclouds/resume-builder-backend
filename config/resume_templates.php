@@ -12,6 +12,11 @@ return [
         'description' => 'Two-column layout with visual hierarchy',
         'status' => 'active',
     ],
+    'professional' => [
+        'name' => 'Professional',
+        'description' => 'Clean, minimalist design with subtle accents',
+        'status' => 'active',
+    ],
 ];
 
 ?>

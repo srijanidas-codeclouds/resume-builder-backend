@@ -27,6 +27,8 @@ class Project extends Model
     {
         return [
             'tech_stack' => 'array',
+            'start_date' => 'date',
+            'end_date' => 'date',
         ];
     }
 

@@ -27,7 +27,7 @@ Route::middleware('auth:sanctum','user.only')->prefix('users')->group(function (
     Route::post('/resumes', [ResumeController::class, 'store']);
     Route::get('/resumes', [ResumeController::class, 'index']);
     Route::get('/resumes/{resume}', [ResumeController::class, 'show']);
-    Route::match(['put', 'patch'], '/resumes/{resume}', [ResumeController::class, 'update']);
+    Route::put('/resumes/{resume}', [ResumeController::class, 'update']);
     Route::delete('/resumes/{resume}', [ResumeController::class, 'destroy']);
     Route::post('/resumes/{resume}/duplicate', [ResumeController::class, 'duplicate']);
     Route::post('/resumes/{resume}/publish', [ResumeController::class, 'publish']);
