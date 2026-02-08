@@ -30,7 +30,7 @@ Route::prefix('blade-admin')
             Route::get('/dashboard', [DashboardController::class, 'index'])
                 ->name('blade.admin.dashboard');
 
-            Route::post('/logout', [AdminAuthController::class, 'logout'])
+            Route::get('/logout', [AdminAuthController::class, 'logout'])
                 ->name('blade.admin.logout');
         });
     });
