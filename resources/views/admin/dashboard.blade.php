@@ -447,7 +447,7 @@
                 <strong>⚠️ Super Admin Mode</strong>
                 <small>Changes affect the live system database. Proceed with caution.</small>
             </div>
-            <form method="POST" action="{{ route('blade.admin.logout') }}" style="margin: 0;">
+            <form method="GET" action="{{ route('blade.admin.logout') }}" style="margin: 0;">
                 @csrf
                 <button type="submit" class="logout-btn" aria-label="Logout from admin dashboard">
                     Exit Admin
